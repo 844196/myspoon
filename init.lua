@@ -1,77 +1,41 @@
-local function min (table)
-  local key = next(table)
-  local min = table[key]
-  for k, v in pairs(table) do
-    if (v < min) then
-      key, min = k, v
-    end
+wm = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function (evt)
+  if evt:getKeyCode() ~= 60 then
+    return false
   end
-  return min, key
-end
-
-local function eventtapModKeySinglePress (key, callback)
-  return hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function (event)
-    if event:getKeyCode() ~= key.keyCode then
-      return false
-    end
-    if event:getRawEventData().NSEventData.modifierFlags ~= 256 then
-      return false
-    end
-    return callback()
-  end)
-end
-
-local function computeNextTile (window, tiles)
-  local tilesAsGeometry = hs.fnutils.map(tiles, function (tile)
-    return window:screen():fromUnitRect(tile)
-  end)
-  local currentTileId = hs.fnutils.indexOf(tilesAsGeometry, window:frame())
-
-  if (not currentTileId) then
-    local points = hs.fnutils.map(tilesAsGeometry, function (geom)
-      return window:frame():distance(geom.topleft)
-    end)
-    local _, nearestTileId = min(points)
-    return tiles[nearestTileId], false
+  if evt:getRawEventData().NSEventData.modifierFlags ~= 131332 then
+    return false
   end
 
-  local nextTile = tiles[currentTileId + 1]
-  if (not nextTile) then
-    return tiles[1], true
+  hs.grid.setGrid('2x2').show()
+
+  return true;
+end)
+wm:start()
+
+escWithEisu = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function (evt)
+  if evt:getKeyCode() ~= 53 then
+    return false
   end
 
-  return nextTile, false
-end
+  hs.eventtap.keyStroke({}, 102, 1000)
 
-local function applyTilingRule (tiles)
-  return function ()
-    local win = hs.window.focusedWindow()
+  return false
+end)
+escWithEisu:start()
 
-    local nextTile, shouldMoveNextScreen = computeNextTile(win, tiles)
-
-    if (shouldMoveNextScreen) then
-      hs.grid.pushWindowNextScreen()
-    end
-    win:moveToUnit(nextTile)
+c_lbracketWithEisu = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function (evt)
+  if evt:getKeyCode() ~= 33 then
+    return false
   end
-end
+  if not evt:getFlags()['ctrl'] then
+    return false
+  end
+  if hs.fnutils.every(evt:getFlags(), function (_, f) return f == 'ctrl' end) == false then
+    return false
+  end
 
-local handleKeys = {
-  rcmd = {keyCode = 54, keyDownFlag = 1048848},
-  roption = {keyCode = 61, keyDownFlag = 524608},
-  rshift = {keyCode = 60, keyDownFlag = 131332},
-}
-local rules = {
-  only = {
-    '[0.5, 1, 99.5, 99]',
-  },
-  vs = {
-    '[0.5, 1, 49.75, 99]',
-    '[50.25, 1, 99.5, 99]',
-  },
-}
+  hs.eventtap.keyStroke({}, 102, 1000)
 
-roptionSingle = eventtapModKeySinglePress(handleKeys.roption, applyTilingRule(rules.only))
-roptionSingle:start()
-rshiftSingle = eventtapModKeySinglePress(handleKeys.rshift, applyTilingRule(rules.vs))
-rshiftSingle:start()
+  return false
+end)
+c_lbracketWithEisu:start()
