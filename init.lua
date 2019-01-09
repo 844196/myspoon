@@ -6,7 +6,7 @@ wm = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function (evt)
     return false
   end
 
-  hs.grid.setGrid('2x2').show()
+  hs.grid.setMargins('10x10').setGrid('2x2').toggleShow()
 
   return true;
 end)
