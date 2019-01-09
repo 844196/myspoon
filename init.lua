@@ -39,18 +39,3 @@ c_lbracketWithEisu = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function
   return false
 end)
 c_lbracketWithEisu:start()
-
-windowHint = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function (evt)
-  if evt:getKeyCode() ~= 61 then
-    return false
-  end
-  if evt:getRawEventData().NSEventData.modifierFlags ~= 524608 then
-    return false
-  end
-
-  hs.hints.showTitleThresh = 100
-  hs.hints.windowHints()
-
-  return false
-end)
-windowHint:start()
